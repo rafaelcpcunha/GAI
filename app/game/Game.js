@@ -45,7 +45,7 @@ export default function Game() {
             <br />
             NEON
           </h1>
-          <p className="tagline">Corra contra o relógio rumo ao pôr do sol</p>
+          <p className="tagline">Corra pelo deserto na noite de Halloween</p>
           <button className="btn" onClick={() => gameRef.current?.start()} autoFocus>
             JOGAR
           </button>

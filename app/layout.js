@@ -3,11 +3,11 @@ import { pixelFont } from "./fonts";
 
 export const metadata = {
   title: "Estrada Neon",
-  description: "Corrida arcade pseudo-3D no navegador, com visual synthwave dos anos 80.",
+  description: "Corrida arcade pseudo-3D no navegador, num deserto em plena noite de Halloween.",
 };
 
 export const viewport = {
-  themeColor: "#0b0221",
+  themeColor: "#040109",
 };
 
 export default function RootLayout({ children }) {

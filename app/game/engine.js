@@ -35,13 +35,14 @@ const SKY_SPEED = 0.001;
 const CITY_SPEED = 0.002;
 const BEST_KEY = "estrada-neon-recorde";
 
+// Noite de Halloween no deserto: areia ao luar, asfalto escuro, zebras laranja e preto
 const COLORS = {
-  fog: "#9e2a6e",
-  grid: "#5c1784",
-  light: { road: "#2b2540", grass: "#22083a", rumble: "#ff2a6d", lane: "#05d9e8" },
-  dark: { road: "#262039", grass: "#1c0730", rumble: "#f2f2f2" },
-  start: { road: "#f2f2f2", grass: "#22083a", rumble: "#f2f2f2" },
-  checkpoint: { road: "#f9c80e", grass: "#22083a", rumble: "#f9c80e" },
+  fog: "#4a1f3d",
+  ripple: "#2a1c14",
+  light: { road: "#25202a", grass: "#3a2a1d", rumble: "#ff7518", lane: "#ffb347" },
+  dark: { road: "#211c25", grass: "#33251a", rumble: "#141014" },
+  start: { road: "#f2f2f2", grass: "#3a2a1d", rumble: "#f2f2f2" },
+  checkpoint: { road: "#9b4dff", grass: "#3a2a1d", rumble: "#9b4dff" },
 };
 
 const ROAD = {
@@ -49,8 +50,6 @@ const ROAD = {
   HILL: { NONE: 0, LOW: 20, MEDIUM: 40, HIGH: 60 },
   CURVE: { NONE: 0, EASY: 2, MEDIUM: 4, HARD: 6 },
 };
-
-const GRID_LINES = [1.7, 2.6, 3.8, 5.4, 7.6, 10.5];
 
 // ---------------------------------------------------------------- utilitários
 const clamp = (v, min, max) => Math.max(min, Math.min(v, max));
@@ -223,15 +222,24 @@ export function createGame(canvas, { onChange, fontFamily = "monospace" } = {}) 
 
     for (let n = 8; n < len; n++) {
       if (reserved.has(n)) continue;
-      if (n % 20 === 0) {
-        add(n, sprites.lamp, -1.12);
-        add(n, sprites.lamp, 1.12);
+      if (n % 24 === 0) {
+        add(n, sprites.torch, -1.12);
+        add(n, sprites.torch, 1.12);
         continue;
       }
-      const density = 0.5 + 0.45 * Math.sin(n / 90);
-      if (n % 3 === 0 && Math.random() < density) add(n, pick(sprites.palms), -(1.35 + Math.random() * 2.2));
-      if (n % 3 === 1 && Math.random() < density) add(n, pick(sprites.palms), 1.35 + Math.random() * 2.2);
-      if (n % 7 === 0 && Math.random() < 0.35) add(n, pick(sprites.palms), (Math.random() < 0.5 ? -1 : 1) * (4 + Math.random() * 3));
+      const side = () => (Math.random() < 0.5 ? -1 : 1);
+      const cemetery = Math.sin(n / 70) > 0.6; // trechos de cemitério à beira da estrada
+      if (cemetery) {
+        if (n % 2 === 0) add(n, pick(sprites.tombs), side() * (1.3 + Math.random() * 1.6));
+        if (n % 9 === 0) add(n, pick(sprites.deadTrees), side() * (2 + Math.random() * 1.5));
+      } else {
+        const density = 0.35 + 0.3 * Math.sin(n / 55);
+        if (n % 3 === 0 && Math.random() < density) add(n, pick(sprites.cacti), -(1.4 + Math.random() * 2.4));
+        if (n % 3 === 1 && Math.random() < density) add(n, pick(sprites.cacti), 1.4 + Math.random() * 2.4);
+        if (n % 13 === 0 && Math.random() < 0.6) add(n, pick(sprites.deadTrees), side() * (1.6 + Math.random() * 2));
+      }
+      if (n % 11 === 5 && Math.random() < 0.55) add(n, pick(sprites.pumpkins), side() * (1.15 + Math.random() * 0.3));
+      if (n % 7 === 0 && Math.random() < 0.4) add(n, pick(sprites.cacti), side() * (4 + Math.random() * 3));
     }
   }
 
@@ -307,7 +315,7 @@ export function createGame(canvas, { onChange, fontFamily = "monospace" } = {}) 
     else pause();
   }
 
-  function showMessage(text, color = "#f9c80e") {
+  function showMessage(text, color = "#ff7518") {
     message = { text, color, t: 2.2 };
   }
 
@@ -425,7 +433,7 @@ export function createGame(canvas, { onChange, fontFamily = "monospace" } = {}) 
       const before = Math.ceil(countdown);
       countdown -= dt;
       if (countdown <= 0) {
-        showMessage("VAI!", "#8ef9f3");
+        showMessage("VAI!", "#ffb347");
         audio.tone(880, 0.35);
         setState("playing");
       } else if (Math.ceil(countdown) !== before) {
@@ -487,52 +495,82 @@ export function createGame(canvas, { onChange, fontFamily = "monospace" } = {}) 
     const horizon = Math.round(H / 2) + 4;
 
     const sky = g.createLinearGradient(0, 0, 0, horizon);
-    sky.addColorStop(0, "#0b0221");
-    sky.addColorStop(0.45, "#2a0a4a");
-    sky.addColorStop(0.78, "#6b1a6b");
+    sky.addColorStop(0, "#040109");
+    sky.addColorStop(0.5, "#160828");
+    sky.addColorStop(0.82, "#3a1638");
     sky.addColorStop(1, COLORS.fog);
     g.fillStyle = sky;
     g.fillRect(0, 0, W, horizon);
     g.fillStyle = COLORS.fog;
     g.fillRect(0, horizon, W, H - horizon);
 
-    for (let i = 0; i < 90; i++) {
-      g.globalAlpha = 0.3 + Math.random() * 0.7;
-      g.fillStyle = Math.random() < 0.2 ? "#8ef9f3" : "#ffffff";
-      const s = Math.random() < 0.15 ? 2 : 1;
-      g.fillRect(Math.random() * W, Math.random() * horizon * 0.55, s, s);
+    for (let i = 0; i < 110; i++) {
+      g.globalAlpha = 0.25 + Math.random() * 0.75;
+      g.fillStyle = Math.random() < 0.15 ? "#ffd9a0" : "#ffffff";
+      const sz = Math.random() < 0.12 ? 2 : 1;
+      g.fillRect(Math.random() * W, Math.random() * horizon * 0.7, sz, sz);
     }
     g.globalAlpha = 1;
 
-    // sol listrado
-    const r = Math.round(H * 0.2);
-    const sun = document.createElement("canvas");
-    sun.width = r * 2;
-    sun.height = r * 2;
-    const sg = sun.getContext("2d");
-    const grad = sg.createLinearGradient(0, 0, 0, r * 2);
-    grad.addColorStop(0, "#fff38a");
-    grad.addColorStop(0.5, "#ffb347");
-    grad.addColorStop(1, "#ff2a6d");
-    sg.fillStyle = grad;
-    sg.beginPath();
-    sg.arc(r, r, r, 0, Math.PI * 2);
-    sg.fill();
-    sg.globalCompositeOperation = "destination-out";
-    for (let i = 0, y = r * 1.05; y < r * 2; i++) {
-      const thick = 2 + i * 1.6;
-      sg.fillRect(0, y, r * 2, thick);
-      y += thick + Math.max(4, 14 - i * 2);
+    // lua cheia com crateras e brilho
+    const r = Math.round(H * 0.11);
+    const mx = Math.round(W * 0.66);
+    const my = Math.round(H * 0.27);
+    const halo = g.createRadialGradient(mx, my, r * 0.8, mx, my, r * 3.2);
+    halo.addColorStop(0, "rgba(255,200,120,0.35)");
+    halo.addColorStop(1, "rgba(255,200,120,0)");
+    g.fillStyle = halo;
+    g.fillRect(mx - r * 4, my - r * 4, r * 8, r * 8);
+    const moon = g.createRadialGradient(mx - r * 0.3, my - r * 0.3, r * 0.1, mx, my, r);
+    moon.addColorStop(0, "#fff6d8");
+    moon.addColorStop(1, "#f2c46d");
+    g.fillStyle = moon;
+    g.beginPath();
+    g.arc(mx, my, r, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = "rgba(170,120,60,0.35)";
+    for (const [cx, cy, cr] of [[-0.35, -0.2, 0.22], [0.3, 0.25, 0.28], [0.1, -0.45, 0.12], [-0.2, 0.45, 0.14], [0.5, -0.15, 0.1]]) {
+      g.beginPath();
+      g.arc(mx + cx * r, my + cy * r, cr * r, 0, Math.PI * 2);
+      g.fill();
     }
-    const sx = Math.round(W / 2 - r);
-    const sy = Math.round(horizon - r * 1.55);
-    g.save();
-    g.shadowColor = "#ff5e9a";
-    g.shadowBlur = 40;
-    g.drawImage(sun, sx, sy);
-    g.restore();
+
+    // nuvens finas passando na frente da lua
+    g.fillStyle = "rgba(20,8,30,0.55)";
+    for (const [ox, oy, w, h] of [[-1.6, 0.35, 2.4, 0.16], [0.2, 0.6, 2.2, 0.12], [-2.4, -0.7, 1.8, 0.1]]) {
+      g.beginPath();
+      g.ellipse(mx + ox * r + (w * r) / 2, my + oy * r, (w * r) / 2, h * r, 0, 0, Math.PI * 2);
+      g.fill();
+    }
 
     skyCanvas = c;
+  }
+
+  // morcegos voando pelo céu
+  const bats = Array.from({ length: 9 }, () => ({
+    x: Math.random(),
+    y: 0.08 + Math.random() * 0.28,
+    speed: 0.02 + Math.random() * 0.04,
+    size: 0.6 + Math.random() * 0.8,
+    phase: Math.random() * Math.PI * 2,
+  }));
+
+  function drawBats() {
+    const t = performance.now() / 1000;
+    ctx.fillStyle = "#050208";
+    for (const b of bats) {
+      const x = (((b.x + t * b.speed) % 1.1) - 0.05) * W;
+      const y = b.y * H + Math.sin(t * 1.3 + b.phase) * 6;
+      const s = b.size * 6;
+      const flap = Math.sin(t * 14 + b.phase) * s * 0.7;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x - s * 0.6, y - flap - s * 0.3, x - s * 1.6, y - flap);
+      ctx.quadraticCurveTo(x - s * 0.8, y + s * 0.1, x, y + s * 0.35);
+      ctx.quadraticCurveTo(x + s * 0.8, y + s * 0.1, x + s * 1.6, y - flap);
+      ctx.quadraticCurveTo(x + s * 0.6, y - flap - s * 0.3, x, y);
+      ctx.fill();
+    }
   }
 
   function drawLayer(img, offset, bottom) {
@@ -572,16 +610,11 @@ export function createGame(canvas, { onChange, fontFamily = "monospace" } = {}) 
     ctx.fillStyle = color.grass;
     ctx.fillRect(0, y2, W, y1 - y2);
 
-    // grade neon no chão
-    if (seg.index % 4 === 0) {
-      ctx.fillStyle = COLORS.grid;
-      const t = Math.max(1, (y1 - y2) * 0.35);
+    // ondulações na areia
+    if (seg.index % 5 === 0) {
+      ctx.fillStyle = COLORS.ripple;
+      const t = Math.max(1, (y1 - y2) * 0.3);
       ctx.fillRect(0, y1 - t, W, t);
-    }
-    for (const k of GRID_LINES) {
-      const g1 = w1 * 0.012, g2 = w2 * 0.012;
-      poly(x1 - w1 * k - g1, y1, x1 - w1 * k + g1, y1, x2 - w2 * k + g2, y2, x2 - w2 * k - g2, y2, COLORS.grid);
-      poly(x1 + w1 * k - g1, y1, x1 + w1 * k + g1, y1, x2 + w2 * k + g2, y2, x2 + w2 * k - g2, y2, COLORS.grid);
     }
 
     poly(x1 - w1 - r1, y1, x1 - w1, y1, x2 - w2, y2, x2 - w2 - r2, y2, color.rumble);
@@ -639,21 +672,21 @@ export function createGame(canvas, { onChange, fontFamily = "monospace" } = {}) 
     ctx.textBaseline = "top";
     const blink = Math.floor(performance.now() / 250) % 2 === 0;
 
-    text("TEMPO", 16, 14, 10, "#8ef9f3");
+    text("TEMPO", 16, 14, 10, "#ffb347");
     const t = Math.max(0, Math.ceil(timeLeft));
-    text(String(t), 16, 30, 28, timeLeft < 10 && blink ? "#ff2a6d" : "#f9c80e");
+    text(String(t), 16, 30, 28, timeLeft < 10 && blink ? "#ff3b3b" : "#ff7518");
 
-    text("PONTOS", W / 2, 14, 10, "#8ef9f3", "center");
+    text("PONTOS", W / 2, 14, 10, "#ffb347", "center");
     text(String(Math.floor(score)).padStart(6, "0"), W / 2, 30, 18, "#ffffff", "center");
-    text(`VOLTA ${lap}`, W / 2, 54, 10, "#ff9ec4", "center");
+    text(`VOLTA ${lap}`, W / 2, 54, 10, "#c9a0ff", "center");
 
     const kmh = Math.round((speed / MAX_SPEED) * 300);
-    text("KM/H", W - 16, 14, 10, "#8ef9f3", "right");
+    text("KM/H", W - 16, 14, 10, "#ffb347", "right");
     text(String(kmh), W - 16, 30, 28, "#ffffff", "right");
     const blocks = 12;
     const lit = Math.round((speed / MAX_SPEED) * blocks);
     for (let i = 0; i < blocks; i++) {
-      ctx.fillStyle = i < lit ? (i < 6 ? "#05d9e8" : i < 10 ? "#f9c80e" : "#ff2a6d") : "rgba(255,255,255,0.15)";
+      ctx.fillStyle = i < lit ? (i < 6 ? "#7cff6b" : i < 10 ? "#ffb347" : "#ff3b3b") : "rgba(255,255,255,0.15)";
       ctx.fillRect(W - 16 - (blocks - i) * 9, 64, 7, 8);
     }
 
@@ -664,7 +697,7 @@ export function createGame(canvas, { onChange, fontFamily = "monospace" } = {}) 
       text(message.text, W / 2, H * 0.28, 18, message.color, "center");
     }
     if (state === "playing" && Math.abs(playerX) > 1 && blink) {
-      text("FORA DA PISTA", W / 2, H * 0.36, 12, "#ff2a6d", "center");
+      text("FORA DA PISTA", W / 2, H * 0.36, 12, "#ff3b3b", "center");
     }
   }
 
@@ -681,8 +714,9 @@ export function createGame(canvas, { onChange, fontFamily = "monospace" } = {}) 
 
     ctx.drawImage(skyCanvas, 0, 0);
     const horizon = Math.round(H / 2) + 4;
-    drawLayer(sprites.mountains, skyOffset, horizon);
-    drawLayer(sprites.city, cityOffset, horizon);
+    drawBats();
+    drawLayer(sprites.mesas, skyOffset, horizon);
+    drawLayer(sprites.dunes, cityOffset, horizon);
 
     let maxy = H;
     let x = 0;

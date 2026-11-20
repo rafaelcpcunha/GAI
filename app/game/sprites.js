@@ -94,63 +94,171 @@ function carImage(color, steer = 0, brake = false) {
 }
 
 // ------------------------------------------------------------------ cenário
-function palmImage(lean) {
-  const c = makeCanvas(240, 440);
+function cactusImage(variant) {
+  const c = makeCanvas(220, 420);
   const g = c.getContext("2d");
-  const bx = 120;
-  const tx = 120 + lean * 45;
-  const ty = 120;
-
-  const trunk = () => {
+  const body = "#1d3a26";
+  const lit = "#3f6b45";
+  const arm = (x, y, dir, len, up) => {
     g.beginPath();
-    g.moveTo(bx, 436);
-    g.quadraticCurveTo(bx - lean * 25, 280, tx, ty);
+    g.moveTo(x, y);
+    g.lineTo(x + dir * len, y);
+    g.lineTo(x + dir * len, y - up);
+    g.stroke();
   };
   g.lineCap = "round";
-  g.strokeStyle = "#ff2a6d";
-  g.lineWidth = 19;
-  trunk();
-  g.stroke();
-  g.strokeStyle = "#16041f";
-  g.lineWidth = 14;
-  trunk();
-  g.stroke();
-
-  const angles = [-175, -145, -115, -80, -50, -20, 10, 200, 160];
-  for (const deg of angles) {
-    const a = (deg * Math.PI) / 180;
-    const L = 100 + (deg % 3) * 4;
-    const ex = tx + Math.cos(a) * L;
-    const ey = ty + Math.sin(a) * L * 0.5 + 38;
-    const cx = tx + Math.cos(a) * L * 0.55;
-    const cy = ty + Math.sin(a) * L * 0.55 - 26;
+  g.lineJoin = "round";
+  for (const [color, w, off] of [[body, 40, 0], [lit, 10, -10]]) {
+    g.strokeStyle = color;
+    g.lineWidth = w;
     g.beginPath();
-    g.moveTo(tx, ty);
-    g.quadraticCurveTo(cx, cy - 9, ex, ey);
-    g.quadraticCurveTo(cx, cy + 11, tx, ty + 6);
-    g.closePath();
-    g.fillStyle = "#16041f";
-    g.fill();
-    g.strokeStyle = "#ff2a6d";
-    g.lineWidth = 2;
+    g.moveTo(110 + off, 412);
+    g.lineTo(110 + off, 40);
+    g.stroke();
+    g.lineWidth = w * 0.75;
+    if (variant !== 2) arm(110 + off, 230, -1, 55, 90);
+    if (variant !== 1) arm(110 + off, 280 - variant * 30, 1, 50, 110);
+  }
+  g.strokeStyle = "rgba(0,0,0,0.25)";
+  g.lineWidth = 2;
+  for (const dx of [-8, 8]) {
+    g.beginPath();
+    g.moveTo(110 + dx, 410);
+    g.lineTo(110 + dx, 50);
     g.stroke();
   }
   return c;
 }
 
-function lampImage() {
+function deadTreeImage(seed) {
+  const c = makeCanvas(300, 420);
+  const g = c.getContext("2d");
+  let rnd = seed * 9301 + 49297;
+  const rand = () => ((rnd = (rnd * 9301 + 49297) % 233280) / 233280);
+  g.strokeStyle = "#0c070d";
+  g.lineCap = "round";
+  const branch = (x, y, angle, len, width, depth) => {
+    const ex = x + Math.cos(angle) * len;
+    const ey = y + Math.sin(angle) * len;
+    g.lineWidth = width;
+    g.beginPath();
+    g.moveTo(x, y);
+    g.quadraticCurveTo(x + Math.cos(angle + 0.4) * len * 0.5, y + Math.sin(angle + 0.4) * len * 0.5, ex, ey);
+    g.stroke();
+    if (depth > 0) {
+      const n = 2 + Math.floor(rand() * 2);
+      for (let i = 0; i < n; i++) {
+        branch(ex, ey, angle + (rand() - 0.5) * 1.6, len * (0.55 + rand() * 0.2), width * 0.62, depth - 1);
+      }
+    }
+  };
+  branch(150, 418, -Math.PI / 2 + (rand() - 0.5) * 0.2, 150, 22, 4);
+  return c;
+}
+
+function pumpkinImage(face) {
+  const c = makeCanvas(160, 130);
+  const g = c.getContext("2d");
+  const glow = g.createRadialGradient(80, 80, 10, 80, 80, 80);
+  glow.addColorStop(0, "rgba(255,150,40,0.45)");
+  glow.addColorStop(1, "rgba(255,150,40,0)");
+  g.fillStyle = glow;
+  g.fillRect(0, 0, 160, 130);
+
+  g.fillStyle = "#2f4d1a";
+  g.fillRect(74, 22, 12, 20);
+  for (const [dx, w, col] of [[-30, 34, "#d4560b"], [30, 34, "#d4560b"], [-12, 32, "#ff7518"], [12, 32, "#ff7518"], [0, 26, "#ff8c2e"]]) {
+    g.fillStyle = col;
+    g.beginPath();
+    g.ellipse(80 + dx, 80, w, 44, 0, 0, Math.PI * 2);
+    g.fill();
+  }
+  g.save();
+  g.shadowColor = "#ffd23f";
+  g.shadowBlur = 14;
+  g.fillStyle = "#ffe066";
+  const tri = (x1, y1, x2, y2, x3, y3) => {
+    g.beginPath();
+    g.moveTo(x1, y1);
+    g.lineTo(x2, y2);
+    g.lineTo(x3, y3);
+    g.fill();
+  };
+  tri(50, 76, 68, 76, 59, 58);
+  tri(92, 76, 110, 76, 101, 58);
+  tri(74, 88, 86, 88, 80, 78);
+  g.beginPath();
+  if (face === 0) {
+    g.moveTo(46, 96);
+    for (let i = 0; i <= 8; i++) g.lineTo(46 + i * 8.5, i % 2 ? 104 : 96 + (i === 0 || i === 8 ? 0 : 4));
+    g.lineTo(114, 96);
+    g.quadraticCurveTo(80, 124, 46, 96);
+  } else {
+    g.moveTo(52, 98);
+    g.quadraticCurveTo(80, 118, 108, 98);
+    g.quadraticCurveTo(80, 108, 52, 98);
+  }
+  g.fill();
+  g.restore();
+  return c;
+}
+
+function tombImage(kind) {
+  const c = makeCanvas(160, 190);
+  const g = c.getContext("2d");
+  g.fillStyle = "rgba(0,0,0,0.4)";
+  g.beginPath();
+  g.ellipse(80, 184, 72, 7, 0, 0, Math.PI * 2);
+  g.fill();
+  const stone = g.createLinearGradient(0, 0, 160, 0);
+  stone.addColorStop(0, "#8d8a9c");
+  stone.addColorStop(1, "#4d4a5c");
+  g.fillStyle = stone;
+  if (kind === 0) {
+    g.beginPath();
+    g.moveTo(22, 186);
+    g.lineTo(22, 70);
+    g.arc(80, 70, 58, Math.PI, 0);
+    g.lineTo(138, 186);
+    g.closePath();
+    g.fill();
+    g.fillStyle = "#2c2a36";
+    g.font = 'bold 36px "Arial Black", Impact, sans-serif';
+    g.textAlign = "center";
+    g.fillText("RIP", 80, 100);
+    g.fillRect(50, 120, 60, 5);
+    g.fillRect(56, 136, 48, 5);
+  } else {
+    g.fillRect(66, 20, 28, 166);
+    g.fillRect(30, 56, 100, 26);
+  }
+  return c;
+}
+
+function torchImage() {
   const c = makeCanvas(90, 420);
   const g = c.getContext("2d");
-  const glow = g.createRadialGradient(68, 56, 2, 68, 56, 40);
-  glow.addColorStop(0, "rgba(142,249,243,0.9)");
-  glow.addColorStop(1, "rgba(142,249,243,0)");
+  const glow = g.createRadialGradient(45, 50, 2, 45, 50, 45);
+  glow.addColorStop(0, "rgba(255,170,60,0.85)");
+  glow.addColorStop(1, "rgba(255,120,30,0)");
   g.fillStyle = glow;
-  g.fillRect(20, 10, 70, 90);
-  g.fillStyle = "#2d2840";
-  g.fillRect(28, 44, 7, 376);
-  g.fillRect(28, 44, 40, 5);
-  g.fillStyle = "#e9ffff";
-  rr(g, 56, 48, 24, 6, 2);
+  g.fillRect(0, 0, 90, 100);
+  g.fillStyle = "#2a1a12";
+  g.fillRect(41, 64, 8, 356);
+  g.fillStyle = "#4a3022";
+  g.fillRect(36, 60, 18, 10);
+  g.fillStyle = "#ff7518";
+  g.beginPath();
+  g.moveTo(32, 62);
+  g.quadraticCurveTo(30, 34, 45, 14);
+  g.quadraticCurveTo(60, 34, 58, 62);
+  g.fill();
+  g.fillStyle = "#ffe066";
+  g.beginPath();
+  g.moveTo(39, 62);
+  g.quadraticCurveTo(38, 44, 45, 30);
+  g.quadraticCurveTo(52, 44, 51, 62);
+  g.fill();
   return c;
 }
 
@@ -161,7 +269,7 @@ function billboardImage(label, color) {
   g.fillRect(95, 190, 16, 110);
   g.fillRect(329, 190, 16, 110);
 
-  g.fillStyle = "#12052a";
+  g.fillStyle = "#120a12";
   g.fillRect(14, 14, 412, 180);
   g.save();
   g.shadowColor = color;
@@ -185,7 +293,7 @@ function billboardImage(label, color) {
 }
 
 function checkpointImage(label) {
-  const c = billboardImage(label, "#f9c80e");
+  const c = billboardImage(label, "#ff7518");
   const g = c.getContext("2d");
   for (let i = 0; i < 26; i++) {
     g.fillStyle = i % 2 ? "#f2f2f2" : "#111";
@@ -197,85 +305,111 @@ function checkpointImage(label) {
 }
 
 // ------------------------------------------------------------------ fundo
-function mountainsImage() {
+function mesasImage() {
   const w = 1024;
-  const h = 150;
+  const h = 130;
+  const c = makeCanvas(w, h);
+  const g = c.getContext("2d");
+  // mesas e chapadas: platôs de topo reto com encostas íngremes
+  const mesas = [
+    [40, 150, 70], [230, 110, 95], [380, 200, 55], [640, 90, 110], [760, 170, 65], [930, 120, 85],
+  ];
+  const height = (x) => {
+    let y = 12 + 8 * Math.sin((x / w) * Math.PI * 6);
+    for (const [mx, mw, mh] of mesas) {
+      for (const xx of [x, x + w, x - w]) {
+        const d = Math.abs(xx - (mx + mw / 2)) - mw / 2;
+        if (d < 0) y = Math.max(y, mh);
+        else if (d < 28) y = Math.max(y, mh * (1 - d / 28) ** 1.5);
+      }
+    }
+    return y;
+  };
+  g.beginPath();
+  g.moveTo(0, h);
+  for (let x = 0; x <= w; x += 2) g.lineTo(x, h - height(x));
+  g.lineTo(w, h);
+  g.closePath();
+  const grad = g.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, "#3b1a3a");
+  grad.addColorStop(1, "#22102a");
+  g.fillStyle = grad;
+  g.fill();
+  g.strokeStyle = "rgba(255,170,90,0.55)";
+  g.lineWidth = 1.5;
+  g.beginPath();
+  for (let x = 0; x <= w; x += 2) g.lineTo(x, h - height(x));
+  g.stroke();
+  return c;
+}
+
+function dunesImage() {
+  const w = 1024;
+  const h = 70;
   const c = makeCanvas(w, h);
   const g = c.getContext("2d");
   const height = (x) => {
     const t = (x / w) * Math.PI * 2;
-    return 70 + 30 * Math.sin(t * 2 + 1) + 22 * Math.sin(t * 5 + 2) + 12 * Math.sin(t * 11 + 0.5) + 6 * Math.sin(t * 23);
+    return 22 + 9 * Math.sin(t * 3 + 0.7) + 6 * Math.sin(t * 7 + 2) + 3 * Math.sin(t * 13);
   };
   g.beginPath();
   g.moveTo(0, h);
   for (let x = 0; x <= w; x += 4) g.lineTo(x, h - height(x));
   g.lineTo(w, h);
   g.closePath();
-  const grad = g.createLinearGradient(0, 0, 0, h);
-  grad.addColorStop(0, "#3d0f63");
-  grad.addColorStop(1, "#200634");
-  g.fillStyle = grad;
+  g.fillStyle = "#1a0f14";
   g.fill();
-  g.strokeStyle = "#ff4f9a";
-  g.lineWidth = 2;
-  g.beginPath();
-  for (let x = 0; x <= w; x += 4) g.lineTo(x, h - height(x));
-  g.stroke();
-  return c;
-}
-
-function cityImage() {
-  const w = 1024;
-  const h = 80;
-  const c = makeCanvas(w, h);
-  const g = c.getContext("2d");
-  const building = (x, bw, bh) => {
-    g.fillStyle = "#12041f";
-    g.fillRect(x, h - bh, bw, bh);
-    g.fillStyle = "#05d9e8";
-    g.fillRect(x, h - bh, bw, 1);
-    for (let wy = h - bh + 5; wy < h - 4; wy += 6) {
-      for (let wx = x + 3; wx < x + bw - 3; wx += 5) {
-        if (Math.random() < 0.3) {
-          g.fillStyle = Math.random() < 0.5 ? "#f9c80e" : "#ff7fc0";
-          g.fillRect(wx, wy, 2, 2);
-        }
-      }
-    }
-  };
-  for (let x = 0; x < w; ) {
-    const gap = Math.random() < 0.35 ? 20 + Math.random() * 60 : 0;
-    x += gap;
-    const bw = 14 + Math.floor(Math.random() * 26);
-    const bh = 18 + Math.floor(Math.random() * 55);
-    building(x, bw, bh);
-    if (x + bw > w) building(x - w, bw, bh);
-    x += bw + 1;
+  // silhuetas de cactos e uma casa assombrada no horizonte
+  g.fillStyle = "#0d070b";
+  for (let i = 0; i < 14; i++) {
+    const x = (i * 73 + 20) % w;
+    const base = h - height(x) + 2;
+    const ch = 10 + ((i * 7) % 9);
+    g.fillRect(x, base - ch, 3, ch);
+    g.fillRect(x - 4, base - ch * 0.6, 4, 2);
+    g.fillRect(x - 4, base - ch * 0.9, 2, ch * 0.3);
+    g.fillRect(x + 3, base - ch * 0.5, 4, 2);
+    g.fillRect(x + 5, base - ch * 0.75, 2, ch * 0.25);
   }
+  const hx = 520;
+  const hb = h - height(hx) + 2;
+  g.fillRect(hx, hb - 22, 30, 22);
+  g.fillRect(hx + 22, hb - 34, 8, 14);
+  g.beginPath();
+  g.moveTo(hx - 3, hb - 22);
+  g.lineTo(hx + 15, hb - 36);
+  g.lineTo(hx + 33, hb - 22);
+  g.fill();
+  g.fillStyle = "#ffb347";
+  g.fillRect(hx + 6, hb - 16, 4, 4);
+  g.fillRect(hx + 19, hb - 16, 4, 4);
   return c;
 }
 
 // ------------------------------------------------------------------ catálogo
 export function buildSprites() {
-  const PLAYER_COLOR = "#ff2a6d";
-  const TRAFFIC = ["#05d9e8", "#f9c80e", "#7b2ff7", "#e8e8f0", "#ff6c11", "#2de2a6"];
+  const PLAYER_COLOR = "#ff7518";
+  const TRAFFIC = ["#9b4dff", "#7cff6b", "#e8e8f0", "#3a3a48", "#c0392b", "#ffd23f"];
 
   return {
     player: [-1, 0, 1].map((steer) => [carImage(PLAYER_COLOR, steer, false), carImage(PLAYER_COLOR, steer, true)]),
     cars: TRAFFIC.map((col) => carImage(col)),
-    palms: [-1, -0.4, 0.4, 1].map((lean) => ({ img: palmImage(lean), worldW: 1300, hitW: 0.18 })),
-    lamp: { img: lampImage(), worldW: 360, hitW: 0.3 },
+    cacti: [0, 1, 2].map((v) => ({ img: cactusImage(v), worldW: 1000, hitW: 0.3 })),
+    deadTrees: [1, 2, 3].map((seed) => ({ img: deadTreeImage(seed), worldW: 1500, hitW: 0.12 })),
+    pumpkins: [0, 1].map((face) => ({ img: pumpkinImage(face), worldW: 500, hitW: 0.6 })),
+    tombs: [0, 1].map((kind) => ({ img: tombImage(kind), worldW: 520, hitW: 0.7 })),
+    torch: { img: torchImage(), worldW: 360, hitW: 0.3 },
     billboards: [
-      ["ESTRADA NEON", "#ff2a6d"],
-      ["ACELERE!", "#05d9e8"],
-      ["PÔR DO SOL", "#f9c80e"],
-      ["TURBO", "#2de2a6"],
-      ["SEM FREIO", "#ff6c11"],
-      ["1986", "#b967ff"],
+      ["DOCES OU TRAVESSURAS", "#ff7518"],
+      ["NOITE DAS BRUXAS", "#9b4dff"],
+      ["BUUU!", "#7cff6b"],
+      ["CEMITÉRIO 2 KM", "#e8e8f0"],
+      ["NÃO OLHE PRA TRÁS", "#ff3b3b"],
+      ["ESTRADA NEON", "#ffb347"],
     ].map(([label, color]) => ({ img: billboardImage(label, color), worldW: 1900, hitW: 0.85 })),
     checkpoint: { img: checkpointImage("CHECKPOINT"), worldW: 1900, hitW: 0.85 },
     start: { img: checkpointImage("LARGADA"), worldW: 1900, hitW: 0.85 },
-    mountains: mountainsImage(),
-    city: cityImage(),
+    mesas: mesasImage(),
+    dunes: dunesImage(),
   };
 }

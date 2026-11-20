@@ -1,6 +1,6 @@
 # Estrada Neon
 
-Jogo de corrida arcade pseudo-3D para o navegador, com visual synthwave dos anos 80.
+Jogo de corrida arcade pseudo-3D para o navegador, ambientado num deserto em plena noite de Halloween.
 Corra contra o relógio, desvie do tráfego e alcance os checkpoints para ganhar tempo extra.
 
 ## Como jogar

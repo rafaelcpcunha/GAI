@@ -4,9 +4,11 @@ Guia para agentes de IA (e pessoas) que trabalham neste repositório.
 
 ## Visão geral
 
-**Estrada Neon** é um jogo de corrida arcade pseudo-3D para o navegador, com visual synthwave
-dos anos 80 (pôr do sol listrado, palmeiras, grade neon). Ele é inspirado no gênero dos jogos
-de corrida de arcade, mas não copia nenhum jogo específico: nome, arte e pista são originais.
+**Estrada Neon** é um jogo de corrida arcade pseudo-3D para o navegador. O cenário é um
+**deserto numa noite de Halloween**: lua cheia, morcegos, mesas e dunas ao fundo, cactos,
+árvores secas, abóboras iluminadas, lápides (trechos de cemitério) e tochas, nas cores laranja e roxo.
+Ele é inspirado no gênero dos jogos de corrida de arcade, mas não copia nenhum jogo específico:
+nome, arte e pista são originais.
 Todo o conteúdo e a interface são em **português (pt-BR)**.
 
 ## Stack
@@ -27,11 +29,11 @@ app/
   page.js          # Página inicial (Server Component): renderiza <Game />
   fonts.js         # Press Start 2P (usada no CSS e no HUD do canvas)
   icon.svg         # Favicon
-  globals.css      # Tela cheia, overlays (menu/pausa/fim), botões de toque
+  globals.css      # Tela cheia, overlays (menu/pausa/fim), botões de toque (tema laranja/roxo)
   game/
     Game.js        # Client Component: canvas, overlays React e controles de toque
     engine.js      # Motor: pista, física, tráfego, checkpoints, renderização e HUD
-    sprites.js     # Sprites gerados em canvas (carros, palmeiras, postes, placas, fundo)
+    sprites.js     # Sprites gerados em canvas (carros, cactos, árvores secas, abóboras, lápides, tochas, placas, mesas e dunas)
     audio.js       # Motor, bipes e batida sintetizados com Web Audio
 ```
 
@@ -66,9 +68,10 @@ Não há testes nem linter configurados. Valide alterações com `npm run build`
 - Estados: `menu` (demonstração com a câmera andando sozinha), `countdown`, `playing`, `paused`, `gameover`.
 - Tempo inicial de 50 s. Checkpoints na largada e na metade da pista dão tempo extra
   (32 s, diminuindo 2 s a cada checkpoint, mínimo de 18 s) e +500 pontos.
-- Fora da pista o carro perde velocidade; bater em palmeiras, postes, placas ou carros reduz a velocidade.
+- Fora da pista o carro perde velocidade; bater em cactos, árvores, abóboras, lápides, tochas, placas ou carros reduz a velocidade.
 - O recorde e a preferência de som ficam no `localStorage` (sempre dentro de try/catch).
 - O jogo pausa sozinho quando a aba fica oculta.
+- O céu (gradiente, estrelas e lua) é pré-renderizado em `buildSky()`; os morcegos são animados em `drawBats()`.
 
 ## Git
 

@@ -7,7 +7,7 @@ body {
   margin: 0;
   height: 100%;
   overflow: hidden;
-  background: #0b0221;
+  background: #040109;
   color: #fff;
   overscroll-behavior: none;
 }
@@ -37,7 +37,7 @@ body {
   gap: 1.25rem;
   padding: 1rem;
   text-align: center;
-  background: rgba(11, 2, 33, 0.45);
+  background: rgba(4, 1, 9, 0.5);
 }
 
 .title {
@@ -45,8 +45,8 @@ body {
   font-size: clamp(2.25rem, 9vw, 5rem);
   line-height: 1.15;
   font-weight: 400;
-  color: #ff2a6d;
-  text-shadow: 0 0 12px #ff2a6d, 4px 4px 0 #05d9e8;
+  color: #ff7518;
+  text-shadow: 0 0 14px #ff7518, 4px 4px 0 #6a1fbf;
   font-style: italic;
 }
 
@@ -54,8 +54,8 @@ body {
   margin: 0;
   font-size: clamp(1.25rem, 5vw, 2.5rem);
   font-weight: 400;
-  color: #f9c80e;
-  text-shadow: 0 0 10px #f9c80e, 3px 3px 0 #ff2a6d;
+  color: #ff7518;
+  text-shadow: 0 0 10px #ff7518, 3px 3px 0 #6a1fbf;
 }
 
 .tagline,
@@ -71,7 +71,7 @@ body {
 }
 
 .best {
-  color: #8ef9f3;
+  color: #c9a0ff;
 }
 
 .btn {
@@ -79,22 +79,22 @@ body {
   font-size: clamp(0.9rem, 3vw, 1.2rem);
   padding: 0.9em 1.6em;
   color: #0b0221;
-  background: #f9c80e;
+  background: #ff7518;
   border: 0;
   border-radius: 4px;
-  box-shadow: 4px 4px 0 #ff2a6d, 0 0 18px rgba(249, 200, 14, 0.6);
+  box-shadow: 4px 4px 0 #6a1fbf, 0 0 18px rgba(255, 117, 24, 0.6);
   cursor: pointer;
 }
 
 .btn:hover,
 .btn:focus-visible {
-  background: #fff38a;
+  background: #ffb347;
   outline: none;
 }
 
 .btn:active {
   transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 #ff2a6d;
+  box-shadow: 2px 2px 0 #6a1fbf;
 }
 
 .help {
@@ -121,7 +121,7 @@ body {
   width: 40px;
   height: 40px;
   color: #fff;
-  background: rgba(11, 2, 33, 0.55);
+  background: rgba(4, 1, 9, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 6px;
   cursor: pointer;
@@ -154,19 +154,19 @@ body {
   width: 72px;
   height: 72px;
   color: #fff;
-  background: rgba(5, 217, 232, 0.18);
-  border: 2px solid rgba(5, 217, 232, 0.6);
+  background: rgba(155, 77, 255, 0.2);
+  border: 2px solid rgba(155, 77, 255, 0.65);
   border-radius: 50%;
   touch-action: none;
 }
 
 .pad button:active {
-  background: rgba(5, 217, 232, 0.45);
+  background: rgba(155, 77, 255, 0.45);
 }
 
 .pad .gas {
-  background: rgba(255, 42, 109, 0.22);
-  border-color: rgba(255, 42, 109, 0.7);
+  background: rgba(255, 117, 24, 0.22);
+  border-color: rgba(255, 117, 24, 0.7);
 }
 
 @media (pointer: coarse) {
