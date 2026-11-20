@@ -1,14 +1,19 @@
 import "./globals.css";
+import { pixelFont } from "./fonts";
 
 export const metadata = {
-  title: "Site em construção",
-  description: "Estamos preparando algo especial.",
+  title: "Estrada Neon",
+  description: "Corrida arcade pseudo-3D no navegador, com visual synthwave dos anos 80.",
+};
+
+export const viewport = {
+  themeColor: "#0b0221",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body className={pixelFont.className}>{children}</body>
     </html>
   );
 }
